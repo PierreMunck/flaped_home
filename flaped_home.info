@@ -1,0 +1,9 @@
+name = flaped Home
+description = "Flap node design"
+core = 7.x
+package = NicaraguaBinary
+version = "1.0-beta"
+project = "NicaraguaBinary"
+
+files[] = flaped_home.module
+files[] = js/flaped_home.js

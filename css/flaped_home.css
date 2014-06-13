@@ -1,0 +1,150 @@
+/* entire container, keeps perspective */
+
+/* entire container, keeps perspective */
+.node {
+    -webkit-perspective: 20000;
+    -moz-perspective: 20000;
+    -ms-perspective: 20000;
+    perspective: 20000;
+    -ms-transform: perspective(20000px);
+    -moz-transform: perspective(20000px);
+    -moz-transform-style: preserve-3d; 
+    -ms-transform-style: preserve-3d; 
+    overflow: hidden;
+}
+
+.node-flaper .front, .node-flaper .back {
+    /*width: 100%;*/
+    /*height: 100;*/
+}
+
+/* flip the pane when hovered */
+.node:hover .node-flaper, .node.hover .node-flaper {
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+    z-index: 1;
+}
+
+/* flip speed goes here */
+.node-flaper {
+    -webkit-transition: 0.7s;
+    -webkit-transform-style: preserve-3d;
+
+    -moz-transition: 0.7s;
+    -moz-transform-style: preserve-3d;
+    -moz-transform: perspective(1000px);
+
+    -o-transition: 0.7s;
+    -o-transform-style: preserve-3d;
+
+    -ms-transition: 0.7s;
+    -ms-transform-style: preserve-3d;
+
+    transition: 0.7s;
+    transform-style: preserve-3d;
+
+    position: relative;
+    z-index: 1;
+    height: 100%;
+}
+
+/* hide back of pane during swap */
+.node-flaper .front,.node-flaper .back{
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* front pane, placed above back */
+.node-flaper .front {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    -webkit-transform: rotateY(0deg);
+    -moz-transform: rotateY(0deg);
+    -o-transform: rotateY(0deg);
+    -ms-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+/* back, initially hidden pane */
+.node-flaper .back {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-transform: rotateY(-180deg);
+    -moz-transform: rotateY(-180deg);
+    -o-transform: rotateY(-180deg);
+    -ms-transform: rotateY(-180deg);
+    transform: rotateY(-180deg);
+    z-index: 3;
+}
+
+.node{
+    float: left;
+    width: 90%;
+    margin:2px;
+    /*height: 150px;*/
+}
+
+.node img{
+    width: 85%;
+}
+
+.node-flaper .back,.node-flaper .front{
+    border-radius: 2em;
+    background-color : #f9ee98;
+    overflow: hidden;
+}
+
+body {
+    font-size:xx-small;
+}
+
+@media all 
+and (min-width : 200px) {
+    body{
+        font-size:x-small;
+    }
+    
+    .node{
+        float: left;
+        width: 48%;
+        margin:2px;
+    }
+}
+
+@media all 
+and (min-width : 450px) {
+    body{
+        font-size:small;
+    }
+    
+    .node{
+        width: 32%;
+        margin:2px;
+    }
+    
+}
+
+@media all 
+and (min-width : 650px) {
+    body{
+        font-size:medium;
+    }
+    
+    .node{
+        width: 24%;
+        margin:3px;
+    }
+}

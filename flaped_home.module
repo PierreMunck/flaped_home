@@ -1,0 +1,154 @@
+<?php
+
+/**
+ * positioning del flapper
+ * 
+ */
+function flaped_home_position($val = NULL) {
+    $flap_positions = array(
+        1 => "front",
+        0 => "back",
+        -1 => "hidden",
+    );
+    if(is_string($val) && strtolower($val) == "all"){
+        return $flap_positions; 
+    }
+    if(is_integer($val) && isset($flap_positions[$val])){
+        return $flap_positions[$val];
+    }
+    return NULL;
+}
+
+function flaped_home_schema_alter(&$schema) {
+  $schema['field_config_instance']['fields']['flap_position'] = array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'unsigned' => FALSE,
+    'default' => 1,
+    'description' => 'field Position Falping added by flaped_home',
+  );
+}
+
+function flaped_home_install(){
+    $schema = drupal_get_schema('field_config_instance');
+    db_add_field('field_config_instance', 'flap_position', $schema['fields']['flap_position']);
+}
+
+function flaped_home_enable(){
+    db_update('field_config_instance')
+        ->fields(array(
+            'flap_position' => 1,
+        ))
+        ->execute();
+}
+
+function flaped_home_disable(){
+    db_update('field_config_instance')
+        ->fields(array(
+            'flap_position' => 1,
+        ))
+        ->execute();
+}
+
+function flaped_home_uninstall(){
+    db_add_field('field_config_instance', 'flap_position');
+}
+
+// hook form alter (para provisonal)
+function flaped_home_form_alter(&$form, $form_state,$form_id){
+    
+}
+
+function flaped_home_js_alter(&$javascript) {  
+
+    $javascript['modules/flaped_home/js/flaped_home.js']['type'] = 'file';
+    $javascript['modules/flaped_home/js/flaped_home.js']['scope'] = 'header';
+    $javascript['modules/flaped_home/js/flaped_home.js']['every_page'] = TRUE;
+    $javascript['modules/flaped_home/js/flaped_home.js']['weight'] = 10;
+    $javascript['modules/flaped_home/js/flaped_home.js']['group'] = 'JS_LIBRARY';
+    $javascript['modules/flaped_home/js/flaped_home.js']['preprocess'] = 1;
+    $javascript['modules/flaped_home/js/flaped_home.js']['defer'] = 0;
+    $javascript['modules/flaped_home/js/flaped_home.js']['cache'] = FALSE;
+    $javascript['modules/flaped_home/js/flaped_home.js']['data'] = drupal_get_path('module', 'flaped_home') . '/js/flaped_home.js';
+}
+
+function flaped_home_css_alter(&$css) {
+    $file_css = drupal_get_path('module', 'flaped_home') . '/css/flaped_home.css';
+    
+    $css[$file_css] = array(
+        "every_page" => TRUE,
+        "media" => 'all',
+        "type" => 'file',
+        "group" => 0,
+        "weight" => 1,
+        "preprocess" => TRUE,
+        "data" => $file_css,
+        "browsers" =>  array(
+            'IE' => TRUE,
+            "!IE" => TRUE,
+        ),
+    );
+}
+
+function flaped_home_node_view($node, $view_mode){
+    $flap_config = flaped_home_get_node_type_config($node->type);
+    $node->flap_back = "";
+    $node->flap_front = ".node-title ";
+    foreach ($flap_config as $key => $value) {
+        if($value == 1){
+            $node->flap_front .= ".field-name-".str_replace("_", "-", $key)." ";
+        }
+        if($value == 0){
+            $node->flap_back .= ".field-name-".str_replace("_", "-", $key)." ";
+        }
+    }
+    $node->flap_back .= ".submitted .link-wrapper ";
+}
+
+function flaped_home_form_field_ui_display_overview_form_alter(&$form, $form_state){
+    array_unshift($form["#submit"],"flaped_home_display_overview_form_submit");
+    $form["fields"]["#header"][] = "flap position";
+    $values = flaped_home_get_node_type_config($form["#bundle"]);
+    foreach ($form["#fields"] as $key => $fields_name) {
+        $form["fields"][$fields_name]["flap"] = array(
+            "#type" => "select",
+            "#title" => "on flap ".$fields_name,
+            "#title_display" => "invisible",
+            "#options" => flaped_home_position("all"),
+            "#default_value" => 1,
+        );
+        if(isset($values[$fields_name])){
+            $form["fields"][$fields_name]["flap"]["#default_value"] = $values[$fields_name]; 
+        }
+    }
+}
+
+function flaped_home_get_node_type_config($node_bundle){
+    $query = db_select('field_config_instance', 'c');
+    $result = $query->fields('c',array('field_name','flap_position'))
+        ->condition("c.bundle",$node_bundle)
+        ->execute();
+    $fields_values = array();
+    while($record = $result->fetchAssoc()){
+        $fields_values[$record['field_name']] = $record['flap_position'] ;
+    }
+    return $fields_values;
+}
+
+function flaped_home_config_node_type($bundle,$field_name,$flap_position){
+    $update = db_merge('field_config_instance') // Table name no longer needs {}
+        ->key(array('field_name' => $field_name,'entity_type' => 'node','bundle' => $bundle))
+        ->fields(array(
+            'flap_position' => $flap_position,
+        ));
+    $update->execute();
+}
+
+function flaped_home_display_overview_form_submit($form, &$form_state){
+    print_r($form);
+    foreach ($form["#fields"] as $key => $fields_name) {
+        //save
+        $flap_position = $form_state["values"]["fields"][$fields_name]["flap"];
+        flaped_home_config_node_type($form["#bundle"],$fields_name,$flap_position);
+    }
+}

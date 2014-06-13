@@ -1,0 +1,18 @@
+INSTALLATION
+------------
+
+1. Add on node theme. And all the page who want use node to flap
+
+    ---- 
+
+    <?php if (isset($node->flap_front) || isset($node->flap_back)): ?>
+    <div class="node-flaper" <?php if (isset($node->flap_front)): ?> data-flap-front="<?php print $node->flap_front; ?>" <?php endif; ?> <?php if (isset( $node->flap_back)): ?>  data-flap-back="<?php print $node->flap_back; ?>" <?php endif; ?>>
+    <?php endif; ?>
+
+        /*** NODE CONTENT ***/
+
+    <?php if (isset($node->flap_front) || isset($node->flap_back)): ?>
+    </div>
+    <?php endif; ?>
+
+    ---- 

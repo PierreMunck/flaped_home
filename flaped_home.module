@@ -19,6 +19,9 @@ function flaped_home_position($val = NULL) {
     return NULL;
 }
 
+/**
+ * cambio del schema 
+ */
 function flaped_home_schema_alter(&$schema) {
   $schema['field_config_instance']['fields']['flap_position'] = array(
     'type' => 'int',

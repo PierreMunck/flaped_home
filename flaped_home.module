@@ -54,7 +54,7 @@ function flaped_home_disable(){
 }
 
 function flaped_home_uninstall(){
-    db_add_field('field_config_instance', 'flap_position');
+    db_drop_field('field_config_instance', 'flap_position');
 }
 
 // hook form alter (para provisonal)
